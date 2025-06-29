@@ -49,7 +49,7 @@ function gen-commit-msg() {
       temperature: ($temp | tonumber),
       messages: [
         { role: "system",
-          content: "You are an assistant that writes concise English conventional-commit messages. Format: <type>(<scope>): <subject>\\n\\n<body>" },
+          content: "You are an assistant that writes concise English conventional-commit messages. Format: <type>(<scope>): <subject>\\n\\n<simple-body>" },
         { role: "user",
           content: "Read the following Git diff and propose a commit message:\\n\\n\($diff)" }
       ]
@@ -58,11 +58,12 @@ function gen-commit-msg() {
   ###########################################################################
   # 3. Call OpenAI API – capture body & status
   ###########################################################################
+  local end_point=https://api.openai.com/v1/chat/completions
   local tmp_rsp; tmp_rsp="$(mktemp)"
   local http_code
   http_code="$(
     curl -sS -w '%{http_code}' -o "$tmp_rsp" \
-      https://api.openai.com/v1/chat/completions \
+       $end_point \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $OPENAI_API_KEY" \
       -d "$request_json"
