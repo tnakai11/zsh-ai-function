@@ -4,7 +4,7 @@
 #   Generate an English conventional-commit message from the staged diff,
 #   print it, and copy it to the clipboard (pbcopy, macOS).
 #
-# Requirements: jq, curl, pbcopy, $OPENAI_API_KEY
+# Requirements: jq, curl, pbcopy, $OPENAI_API_KEY, $OPENAI_ENDPOINT
 #
 # Usage examples
 #   git add .
@@ -24,6 +24,11 @@ function gen-commit-msg() {
   ###########################################################################
   if [[ -z "${OPENAI_API_KEY:-}" ]]; then
     echo "ERROR: OPENAI_API_KEY is not set." >&2
+    return 1
+  fi
+
+  if [[ -z "${OPENAI_ENDPOINT:-}" ]]; then
+    echo "ERROR: OPENAI_ENDPOINT is not set." >&2
     return 1
   fi
 
@@ -58,7 +63,7 @@ function gen-commit-msg() {
   ###########################################################################
   # 3. Call OpenAI API – capture body & status
   ###########################################################################
-  local end_point=https://api.openai.com/v1/chat/completions
+  local end_point="$OPENAI_ENDPOINT"
   local tmp_rsp; tmp_rsp="$(mktemp)"
   local http_code
   http_code="$(

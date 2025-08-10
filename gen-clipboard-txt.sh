@@ -3,7 +3,7 @@
 # gen-clipboard-txt.sh
 #   Save clipboard text to a .txt file named via OpenAI.
 #
-# Requirements: jq, curl, pbpaste, $OPENAI_API_KEY
+# Requirements: jq, curl, pbpaste, $OPENAI_API_KEY, $OPENAI_ENDPOINT
 #
 # Usage examples
 #   gen-clipboard-txt            # default: o4-mini  (temp forced to 1.0)
@@ -22,6 +22,11 @@ function gen-clipboard-txt() {
   ###########################################################################
   if [[ -z "${OPENAI_API_KEY:-}" ]]; then
     echo "ERROR: OPENAI_API_KEY is not set." >&2
+    return 1
+  fi
+
+  if [[ -z "${OPENAI_ENDPOINT:-}" ]]; then
+    echo "ERROR: OPENAI_ENDPOINT is not set." >&2
     return 1
   fi
 
@@ -56,7 +61,7 @@ function gen-clipboard-txt() {
   ###########################################################################
   # 3. Call OpenAI API – capture body & status
   ###########################################################################
-  local end_point=https://api.openai.com/v1/chat/completions
+  local end_point="$OPENAI_ENDPOINT"
   local tmp_rsp; tmp_rsp="$(mktemp)"
   local http_code
   http_code="$(
